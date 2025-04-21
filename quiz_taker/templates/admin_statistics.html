@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Statistics</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Admin Statistics</h2>
+    <p>Welcome, Quiz Master! Here are the platform statistics.</p>
+
+    <!-- Summary Stats -->
+    <h3>Overview</h3>
+    <ul>
+        <li><strong>Total Users:</strong> {{ total_users }}</li>
+        <li><strong>Active Users:</strong> {{ active_users }}</li>
+        <li><strong>Blocked Users:</strong> {{ blocked_users }}</li>
+        <li><strong>Total Quizzes:</strong> {{ total_quizzes }}</li>
+        <li><strong>Most Attempted Quiz:</strong> {{ most_attempted_quiz[1] }} ({{ most_attempted_quiz[2] }} attempts)</li>
+    </ul>
+
+    <!-- User Statistics Chart -->
+    <h3>User Statistics</h3>
+    <div style="width: 50%; max-width: 400px; margin: auto;">
+        <canvas id="userChart"></canvas>
+    </div>
+    
+    <h3>Quiz Performance</h3>
+    <div style="width: 60%; max-width: 500px; margin: auto;">
+        <canvas id="quizChart"></canvas>
+    </div>
+    
+
+    <script>
+        // User Statistics (Active vs Blocked)
+        new Chart(document.getElementById("userChart"), {
+            type: "pie",
+            data: {
+                labels: ["Active Users", "Blocked Users"],
+                datasets: [{
+                    data: [{{ active_users }}, {{ blocked_users }}],
+                    backgroundColor: ["#4CAF50", "#FF5722"]
+                }]
+            }
+        });
+
+        // Quiz Performance (Most Attempted Quizzes)
+        new Chart(document.getElementById("quizChart"), {
+            type: "bar",
+            data: {
+                labels: {{ quiz_labels | tojson }},
+                datasets: [{
+                    label: "Number of Attempts",
+                    data: {{ quiz_attempts | tojson }},
+                    backgroundColor: "#36A2EB"
+                }]
+            }
+        });
+    </script>
+
+    <br>
+    <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

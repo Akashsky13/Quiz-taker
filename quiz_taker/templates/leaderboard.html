@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Leaderboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h2>Leaderboard</h2>
+    <p>Top Scoring Users</p>
+
+    {% if leaderboard %}
+        <table border="1">
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Total Score</th>
+            </tr>
+            {% for rank, user in enumerate(leaderboard, start=1) %}
+                <tr>
+                    <td>{{ rank }}</td>
+                    <td>{{ user[1] }} ({{ user[0] }})</td>
+                    <td>{{ user[2] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No scores recorded yet.</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>

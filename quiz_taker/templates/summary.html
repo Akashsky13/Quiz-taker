@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Quiz Summary</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            text-align: center;
+        }
+        .chart-container {
+            width: 60%; /* Reduce width */
+            height: 300px; /* Limit height */
+            margin: auto;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        canvas {
+            width: 100% !important;
+            height: 250px !important; /* Set smaller height */
+        }
+    </style>
+</head>
+<body>
+    <h2>📊 My Quiz Performance</h2>
+    
+    <div class="chart-container">
+        <h3>📅 Scores Over Time (Last Month)</h3>
+        <canvas id="quizScoreChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h3>📚 Performance by Subject</h3>
+        <canvas id="subjectPerformanceChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h3>✅ Correct vs Incorrect Answers</h3>
+        <canvas id="correctIncorrectChart"></canvas>
+    </div>
+
+    <a href="{{ url_for('home') }}" class="btn btn-primary">⬅ Back to Home</a>
+
+    <script>
+        const scores = {{ scores | tojson }};
+        const dates = {{ dates | tojson }};
+        const subjects = {{ subjects | tojson }};
+        const subjectScores = {{ subject_scores | tojson }};
+        const correctAnswers = {{ correct_answers | tojson }};
+        const incorrectAnswers = {{ incorrect_answers | tojson }};
+
+        // Line Chart: Scores Over Time
+        new Chart(document.getElementById("quizScoreChart"), {
+            type: "line",
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: "Score",
+                    data: scores,
+                    borderColor: "#457b9d",
+                    backgroundColor: "rgba(69, 123, 157, 0.2)",
+                    borderWidth: 2
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false  // Prevents automatic resizing
+            }
+        });
+
+        // Bar Chart: Subject-Wise Performance
+        new Chart(document.getElementById("subjectPerformanceChart"), {
+            type: "bar",
+            data: {
+                labels: subjects,
+                datasets: [{
+                    label: "Avg Score",
+                    data: subjectScores,
+                    backgroundColor: "#1d3557"
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false 
+            }
+        });
+
+        // Pie Chart: Correct vs Incorrect Answers
+        new Chart(document.getElementById("correctIncorrectChart"), {
+            type: "pie",
+            data: {
+                labels: ["Correct", "Incorrect"],
+                datasets: [{
+                    data: [correctAnswers, incorrectAnswers],
+                    backgroundColor: ["#28a745", "#dc3545"]
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false 
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quiz</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<style>
+    .question-box {
+    text-align: left; /* Ensure everything in the box aligns left */
+    margin-bottom: 15px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column; /* Stack options vertically */
+    align-items: flex-start; /* Align options to the left */
+    gap: 5px; /* Adds spacing between options */
+}
+
+.options label {
+    display: flex;
+    align-items: center; /* Align radio buttons and text */
+    gap: 5px; /* Add space between radio button and text */
+}
+
+input[type="radio"] {
+    margin: 0; /* Remove unwanted margins */
+    transform: scale(1.2); /* Optional: Make the radio button slightly larger */
+}
+
+
+</style>
+    <script>
+        function startTimer(duration) {
+            let endTime = sessionStorage.getItem("quiz_end_time");
+            
+            // If no end time is stored, set it now
+            if (!endTime) {
+                endTime = Date.now() + duration * 1000; // Store absolute end time
+                sessionStorage.setItem("quiz_end_time", endTime);
+            } else {
+                endTime = parseInt(endTime); // Convert stored value back to integer
+            }
+    
+            function updateTimer() {
+                let now = Date.now();
+                let timeLeft = Math.max(0, Math.floor((endTime - now) / 1000)); // Remaining time in seconds
+    
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+    
+                document.getElementById("timer").textContent = minutes + ":" + seconds;
+    
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    alert("Time is up! Submitting quiz now.");
+                    sessionStorage.removeItem("quiz_end_time"); // Clear stored time
+                    document.getElementById("quizForm").submit();
+                }
+            }
+    
+            updateTimer();
+            let countdown = setInterval(updateTimer, 1000);
+        }
+    
+        window.onload = function () {
+            const quizTime = {{ quiz[2]|int }} * 60; // ✅ Convert minutes to seconds correctly
+            startTimer(quizTime);
+        };
+    </script>
+    
+
+</head>
+<body>
+    <h2>Quiz</h2>
+    <p><strong>Date:</strong> {{ quiz[1] }} | <strong>Duration:</strong> {{ quiz[2] }} minutes</p>
+    <p><strong>Time Left:</strong> <span id="timer" style="font-size: 20px; font-weight: bold; color: red;"></span></p>
+
+    <form id="quizForm" action="{{ url_for('submit_quiz') }}" method="POST">
+        <input type="hidden" name="quiz_id" value="{{ quiz[0] }}">
+
+        {% for question in questions %}
+    <div class="question-box">
+        <p><strong>{{ question[1] }}</strong></p>
+        <div class="options">
+            <label><input type="radio" name="answer_{{ question[0] }}" value="1"> {{ question[2] }}</label>
+            <label><input type="radio" name="answer_{{ question[0] }}" value="2"> {{ question[3] }}</label>
+            <label><input type="radio" name="answer_{{ question[0] }}" value="3"> {{ question[4] }}</label>
+            <label><input type="radio" name="answer_{{ question[0] }}" value="4"> {{ question[5] }}</label>
+        </div>
+    </div>
+{% endfor %}
+
+
+        <br>
+        <button type="submit">Submit Quiz</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>
